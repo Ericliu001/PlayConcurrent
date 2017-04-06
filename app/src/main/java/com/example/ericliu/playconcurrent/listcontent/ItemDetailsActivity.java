@@ -1,7 +1,10 @@
-package com.example.ericliu.playconcurrent;
+package com.example.ericliu.playconcurrent.listcontent;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
@@ -10,13 +13,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 
+import com.example.ericliu.playconcurrent.R;
+import com.example.ericliu.playconcurrent.listcontent.ItemListActivity;
+import com.example.ericliu.playconcurrent.semaphore.SemaphoreFragment;
+
 /**
  * An activity representing a single Item detail screen. This
  * activity is only used narrow width devices. On tablet-size devices,
  * item activity are presented side-by-side with a list of items
  * in a {@link ItemListActivity}.
  */
-public class ItemDetailActivity extends AppCompatActivity {
+public class ItemDetailsActivity extends AppCompatActivity {
+
+    public static final String ARG_ITEM = "list.item";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +49,7 @@ public class ItemDetailActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+
         // savedInstanceState is non-null when there is fragment state
         // saved from previous configurations of this activity
         // (e.g. when rotating the screen from portrait to landscape).
@@ -52,14 +62,14 @@ public class ItemDetailActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putString(ItemDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(ItemDetailFragment.ARG_ITEM_ID));
-            ItemDetailFragment fragment = new ItemDetailFragment();
-            fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.item_detail_container, fragment)
-                    .commit();
+            final Intent intent = getIntent();
+            if (intent != null) {
+                final ListItem listitem = intent.getParcelableExtra(ARG_ITEM);
+                Fragment fragment = new FragmentFactory().createFragment(listitem);
+                getFragmentManager().beginTransaction()
+                        .add(R.id.item_detail_container, fragment)
+                        .commit();
+            }
         }
     }
 
