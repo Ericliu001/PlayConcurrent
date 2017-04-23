@@ -17,6 +17,8 @@ import com.example.ericliu.playconcurrent.listcontent.ItemListActivity;
 import com.example.ericliu.playconcurrent.listcontent.ListItem;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import static com.example.ericliu.playconcurrent.listcontent.ItemDetailsActivity.ARG_ITEM;
@@ -29,9 +31,12 @@ import static com.example.ericliu.playconcurrent.listcontent.ItemDetailsActivity
  */
 public class SemaphoreFragment extends BaseFragment {
 
+    // the 5 progressbars that take turns to increment.
     private ProgressBar pb1, pb2, pb3, pb4, pb5;
 
     private static final int NUM_PROGRESSBARS = 5;
+
+    private final List<WorkerThread> threads = new ArrayList<>(NUM_PROGRESSBARS);
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -73,6 +78,8 @@ public class SemaphoreFragment extends BaseFragment {
         ProgressBarHandler progressBarHandler5 = new ProgressBarHandler(pb5);
 
         Semaphore[] semaphores = new Semaphore[NUM_PROGRESSBARS];
+
+        // notice the first Semaphore is 'open' while the rest are 'closed'
         semaphores[0] = new Semaphore(1);
         semaphores[1] = new Semaphore(0);
         semaphores[2] = new Semaphore(0);
@@ -80,11 +87,24 @@ public class SemaphoreFragment extends BaseFragment {
         semaphores[4] = new Semaphore(0);
 
 
-        new WorkerThread(progressBarHandler1, semaphores, 0).start();
-        new WorkerThread(progressBarHandler2, semaphores, 1).start();
-        new WorkerThread(progressBarHandler3, semaphores, 2).start();
-        new WorkerThread(progressBarHandler4, semaphores, 3).start();
-        new WorkerThread(progressBarHandler5, semaphores, 4).start();
+        threads.add(new WorkerThread(progressBarHandler1, semaphores, 0));
+        threads.add(new WorkerThread(progressBarHandler2, semaphores, 1));
+        threads.add(new WorkerThread(progressBarHandler3, semaphores, 2));
+        threads.add(new WorkerThread(progressBarHandler4, semaphores, 3));
+        threads.add(new WorkerThread(progressBarHandler5, semaphores, 4));
+
+        for (final WorkerThread thread : threads) {
+            thread.start();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        for (final WorkerThread thread : threads) {
+            thread.interrupt();
+        }
+        threads.clear();
     }
 
     private static class ProgressBarHandler extends Handler {
@@ -120,15 +140,19 @@ public class SemaphoreFragment extends BaseFragment {
         }
 
 
+        /**
+         * We use Semaphores here to coordinate the threads because the Semaphore in java is not 'fully-bracketed',
+         * which means the thread to release a permit does not have to be the one that has acquired
+         * the permit in the first place.
+         * We can utilise this feature of Semaphore to let one thread to release a permit for the next thread.
+         */
         @Override
         public void run() {
             final Semaphore currentSemaphore = semaphores[index];
             final Semaphore nextSemaphore = semaphores[(index + 1) % semaphores.length];
 
             try {
-
                 while (true) {
-
                     currentSemaphore.acquire();
 
                     sleep(1000);
