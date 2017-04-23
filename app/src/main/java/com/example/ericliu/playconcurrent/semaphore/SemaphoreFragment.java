@@ -127,7 +127,7 @@ public class SemaphoreFragment extends BaseFragment {
 
             try {
 
-                while (progress <= 100) {
+                while (true) {
 
                     currentSemaphore.acquire();
 
@@ -138,8 +138,10 @@ public class SemaphoreFragment extends BaseFragment {
 
                     nextSemaphore.release();
 
+                    if (progress == 100) {
+                        progress = 0;
+                    }
                 }
-                interrupt();
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
