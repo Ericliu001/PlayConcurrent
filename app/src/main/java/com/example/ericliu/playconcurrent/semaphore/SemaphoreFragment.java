@@ -79,7 +79,7 @@ public class SemaphoreFragment extends BaseFragment {
 
         Semaphore[] semaphores = new Semaphore[NUM_PROGRESSBARS];
 
-        // notice the first Semaphore is 'open' while the rest are 'closed'
+        // notice the first Semaphore is 'unlocked' while the rest are 'locked'
         semaphores[0] = new Semaphore(1);
         semaphores[1] = new Semaphore(0);
         semaphores[2] = new Semaphore(0);
@@ -139,7 +139,6 @@ public class SemaphoreFragment extends BaseFragment {
             this.index = index;
         }
 
-
         /**
          * We use Semaphores here to coordinate the threads because the Semaphore in java is not 'fully-bracketed',
          * which means the thread to release a permit does not have to be the one that has acquired
@@ -155,7 +154,7 @@ public class SemaphoreFragment extends BaseFragment {
                 while (true) {
                     currentSemaphore.acquire();
 
-                    sleep(1000);
+                    sleep(1000); // we use a sleep call to mock some lengthy work.
                     Message message = progressBarHandler.obtainMessage();
                     message.arg1 = (progress += 10);
                     progressBarHandler.sendMessage(message);
