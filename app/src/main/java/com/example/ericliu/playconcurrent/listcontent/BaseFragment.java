@@ -3,7 +3,9 @@ package com.example.ericliu.playconcurrent.listcontent;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.view.View;
 
 import com.example.ericliu.playconcurrent.R;
 
@@ -15,8 +17,8 @@ import static com.example.ericliu.playconcurrent.listcontent.ItemDetailsActivity
 
 public class BaseFragment extends Fragment {
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         final Bundle arguments = getArguments();
         final ListItem listItem = arguments.getParcelable(ARG_ITEM);
 

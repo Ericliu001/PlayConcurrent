@@ -57,6 +57,7 @@ public class SemaphoreFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.item_detail, container, false);
         pb1 = (ProgressBar) rootView.findViewById(R.id.progressBar1);
         pb2 = (ProgressBar) rootView.findViewById(R.id.progressBar2);
