@@ -54,6 +54,33 @@ public class SemaphoreFragment extends BaseFragment {
         return fragment;
     }
 
+
+    @Override
+    public void onCreate(@Nullable final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+
+        Semaphore[] semaphores = new Semaphore[NUM_PROGRESSBARS];
+
+        // notice the first Semaphore is 'unlocked' while the rest are 'locked'
+        semaphores[0] = new Semaphore(1);
+        semaphores[1] = new Semaphore(0);
+        semaphores[2] = new Semaphore(0);
+        semaphores[3] = new Semaphore(0);
+        semaphores[4] = new Semaphore(0);
+
+
+        threads.add(new WorkerThread(semaphores, 0));
+        threads.add(new WorkerThread(semaphores, 1));
+        threads.add(new WorkerThread(semaphores, 2));
+        threads.add(new WorkerThread(semaphores, 3));
+        threads.add(new WorkerThread(semaphores, 4));
+
+        for (final WorkerThread thread : threads) {
+            thread.start();
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -78,30 +105,16 @@ public class SemaphoreFragment extends BaseFragment {
         ProgressBarHandler progressBarHandler4 = new ProgressBarHandler(pb4);
         ProgressBarHandler progressBarHandler5 = new ProgressBarHandler(pb5);
 
-        Semaphore[] semaphores = new Semaphore[NUM_PROGRESSBARS];
-
-        // notice the first Semaphore is 'unlocked' while the rest are 'locked'
-        semaphores[0] = new Semaphore(1);
-        semaphores[1] = new Semaphore(0);
-        semaphores[2] = new Semaphore(0);
-        semaphores[3] = new Semaphore(0);
-        semaphores[4] = new Semaphore(0);
-
-
-        threads.add(new WorkerThread(progressBarHandler1, semaphores, 0));
-        threads.add(new WorkerThread(progressBarHandler2, semaphores, 1));
-        threads.add(new WorkerThread(progressBarHandler3, semaphores, 2));
-        threads.add(new WorkerThread(progressBarHandler4, semaphores, 3));
-        threads.add(new WorkerThread(progressBarHandler5, semaphores, 4));
-
-        for (final WorkerThread thread : threads) {
-            thread.start();
-        }
+        threads.get(0).setProgressBarHandler(progressBarHandler1);
+        threads.get(1).setProgressBarHandler(progressBarHandler2);
+        threads.get(2).setProgressBarHandler(progressBarHandler3);
+        threads.get(3).setProgressBarHandler(progressBarHandler4);
+        threads.get(4).setProgressBarHandler(progressBarHandler5);
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onDestroy() {
+        super.onDestroy();
         for (final WorkerThread thread : threads) {
             thread.interrupt();
         }
@@ -129,15 +142,19 @@ public class SemaphoreFragment extends BaseFragment {
 
     private static class WorkerThread extends Thread {
 
-        private final ProgressBarHandler progressBarHandler;
+        private ProgressBarHandler progressBarHandler;
         private final Semaphore[] semaphores;
         private final int index;
         private int progress;
 
-        public WorkerThread(final ProgressBarHandler progressBarHandler, final Semaphore[] semaphores, final int index) {
-            this.progressBarHandler = progressBarHandler;
+        public WorkerThread(final Semaphore[] semaphores, final int index) {
             this.semaphores = semaphores;
             this.index = index;
+        }
+
+
+        public void setProgressBarHandler(final ProgressBarHandler progressBarHandler) {
+            this.progressBarHandler = progressBarHandler;
         }
 
         /**
@@ -156,9 +173,11 @@ public class SemaphoreFragment extends BaseFragment {
                     currentSemaphore.acquire();
 
                     sleep(1000); // we use a sleep call to mock some lengthy work.
-                    Message message = progressBarHandler.obtainMessage();
-                    message.arg1 = (progress += 10);
-                    progressBarHandler.sendMessage(message);
+                    if (progressBarHandler != null) {
+                        Message message = progressBarHandler.obtainMessage();
+                        message.arg1 = (progress += 10);
+                        progressBarHandler.sendMessage(message);
+                    }
 
                     nextSemaphore.release();
 
