@@ -223,7 +223,7 @@ public class SemaphoreFragment extends BaseFragment {
                         condition.await();
                     }
                     lock.unlock();
-                    sleep(1000); // we use a sleep call to mock some lengthy work.
+                    sleep(300); // we use a sleep call to mock some lengthy work.
                     if (progressBarHandler != null) {
                         Message message = progressBarHandler.obtainMessage();
                         message.arg1 = (progress += 10);
@@ -233,7 +233,7 @@ public class SemaphoreFragment extends BaseFragment {
                     nextSemaphore.release();
 
                     if (progress == 100) {
-                        progress = 0;
+                        progress = -10;
                     }
                 }
 
