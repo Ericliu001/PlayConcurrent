@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.example.ericliu.playconcurrent.R;
@@ -20,6 +21,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.example.ericliu.playconcurrent.listcontent.ItemDetailsActivity.ARG_ITEM;
 
@@ -33,10 +36,13 @@ public class SemaphoreFragment extends BaseFragment {
 
     // the 5 progressbars that take turns to increment.
     private ProgressBar pb1, pb2, pb3, pb4, pb5;
+    private Button btnPlay;
 
     private static final int NUM_PROGRESSBARS = 5;
 
     private final List<WorkerThread> threads = new ArrayList<>(NUM_PROGRESSBARS);
+    private boolean hasWorkStarted = false;
+    private boolean isPlaying = false;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -76,8 +82,23 @@ public class SemaphoreFragment extends BaseFragment {
         threads.add(new WorkerThread(semaphores, 3));
         threads.add(new WorkerThread(semaphores, 4));
 
-        for (final WorkerThread thread : threads) {
-            thread.start();
+    }
+
+    private void toggleWork() {
+
+        if (hasWorkStarted) {
+            for (final WorkerThread thread : threads) {
+                if (thread.isSuspended) {
+                    thread.resumePlay();
+                } else {
+                    thread.pausePlay();
+                }
+            }
+        } else {
+            for (final WorkerThread thread : threads) {
+                thread.start();
+            }
+            hasWorkStarted = true;
         }
     }
 
@@ -91,6 +112,8 @@ public class SemaphoreFragment extends BaseFragment {
         pb3 = (ProgressBar) rootView.findViewById(R.id.progressBar3);
         pb4 = (ProgressBar) rootView.findViewById(R.id.progressBar4);
         pb5 = (ProgressBar) rootView.findViewById(R.id.progressBar5);
+
+        btnPlay = (Button) rootView.findViewById(R.id.btnPlay);
 
         return rootView;
     }
@@ -110,6 +133,24 @@ public class SemaphoreFragment extends BaseFragment {
         threads.get(2).setProgressBarHandler(progressBarHandler3);
         threads.get(3).setProgressBarHandler(progressBarHandler4);
         threads.get(4).setProgressBarHandler(progressBarHandler5);
+
+
+        btnPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                toggleWork();
+                changeButtonTextIcon();
+            }
+        });
+    }
+
+    private void changeButtonTextIcon() {
+        isPlaying = !isPlaying;
+        if (isPlaying) {
+            btnPlay.setText("Pause");
+        } else {
+            btnPlay.setText("Play");
+        }
     }
 
     @Override
@@ -142,14 +183,19 @@ public class SemaphoreFragment extends BaseFragment {
 
     private static class WorkerThread extends Thread {
 
+        private final Condition condition;
         private ProgressBarHandler progressBarHandler;
         private final Semaphore[] semaphores;
         private final int index;
         private int progress;
+        private boolean isSuspended = false;
+        private final ReentrantLock lock;
 
         public WorkerThread(final Semaphore[] semaphores, final int index) {
             this.semaphores = semaphores;
             this.index = index;
+            lock = new ReentrantLock();
+            condition = lock.newCondition();
         }
 
 
@@ -172,6 +218,11 @@ public class SemaphoreFragment extends BaseFragment {
                 while (true) {
                     currentSemaphore.acquire();
 
+                    lock.lock();
+                    if (isSuspended) {
+                        condition.await();
+                    }
+                    lock.unlock();
                     sleep(1000); // we use a sleep call to mock some lengthy work.
                     if (progressBarHandler != null) {
                         Message message = progressBarHandler.obtainMessage();
@@ -189,6 +240,19 @@ public class SemaphoreFragment extends BaseFragment {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+
+        public void resumePlay() {
+            lock.lock();
+            isSuspended = false;
+            condition.signal();
+            lock.unlock();
+        }
+
+        public void pausePlay() {
+            lock.lock();
+            isSuspended = true;
+            lock.unlock();
         }
     }
 }

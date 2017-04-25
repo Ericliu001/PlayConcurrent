@@ -48,6 +48,7 @@
         android:layout_margin="@dimen/fab_margin"
         app:layout_anchor="@+id/item_detail_container"
         app:layout_anchorGravity="top|end"
+        android:visibility="gone"
         app:srcCompat="@android:drawable/stat_notify_chat" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -9,6 +9,15 @@
               android:padding="30dp"
               tools:context="com.example.ericliu.playconcurrent.semaphore.SemaphoreFragment">
 
+    <Button
+        android:id="@+id/btnPlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@android:drawable/ic_media_play"
+        android:gravity="center"
+        android:text="Play"
+        />
+
     <ProgressBar
         android:id="@+id/progressBar1"
         style="?android:attr/progressBarStyleHorizontal"
