@@ -219,7 +219,7 @@ public class SemaphoreFragment extends BaseFragment {
                     currentSemaphore.acquire();
 
                     lock.lock();
-                    if (isSuspended) {
+                    while (isSuspended) {
                         condition.await();
                     }
                     lock.unlock();
