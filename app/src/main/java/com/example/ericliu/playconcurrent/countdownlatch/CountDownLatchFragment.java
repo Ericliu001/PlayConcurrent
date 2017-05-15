@@ -2,6 +2,7 @@ package com.example.ericliu.playconcurrent.countdownlatch;
 
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,12 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.ericliu.playconcurrent.R;
 import com.example.ericliu.playconcurrent.listcontent.BaseFragment;
 import com.example.ericliu.playconcurrent.listcontent.ListItem;
 import com.example.ericliu.playconcurrent.listcontent.ProgressBarHandler;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -96,6 +99,7 @@ public class CountDownLatchFragment extends BaseFragment {
             public void onClick(final View v) {
                 new InitializingTask(beforeLatch).execute();
                 toggleWork();
+                new FinishingTask(getActivity(), afterLatch).execute();
             }
         });
     }
@@ -151,5 +155,35 @@ public class CountDownLatchFragment extends BaseFragment {
             initializingView.setVisibility(View.GONE);
         }
     }
+
+    private static class FinishingTask extends AsyncTask<Void, Void, Void> {
+
+        private WeakReference<Context> contextRef;
+        private final CountDownLatch afterLatch;
+
+        public FinishingTask(final Context context, final CountDownLatch afterLatch) {
+            contextRef = new WeakReference<Context>(context);
+            this.afterLatch = afterLatch;
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+            try {
+                afterLatch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(final Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (contextRef.get() != null) {
+                Toast.makeText(contextRef.get(), "Awesome!!!", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
 
 }
