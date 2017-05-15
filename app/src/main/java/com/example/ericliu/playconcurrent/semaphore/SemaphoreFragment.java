@@ -2,7 +2,6 @@ package com.example.ericliu.playconcurrent.semaphore;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -16,8 +15,8 @@ import com.example.ericliu.playconcurrent.listcontent.BaseFragment;
 import com.example.ericliu.playconcurrent.listcontent.ItemDetailsActivity;
 import com.example.ericliu.playconcurrent.listcontent.ItemListActivity;
 import com.example.ericliu.playconcurrent.listcontent.ListItem;
+import com.example.ericliu.playconcurrent.listcontent.ProgressBarHandler;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -155,24 +154,6 @@ public class SemaphoreFragment extends BaseFragment {
             thread.interrupt();
         }
         threads.clear();
-    }
-
-    private static class ProgressBarHandler extends Handler {
-
-        private final WeakReference<ProgressBar> progressBarWeakReference;
-
-        public ProgressBarHandler(ProgressBar progressBar) {
-            progressBarWeakReference = new WeakReference<>(progressBar);
-        }
-
-        @Override
-        public void handleMessage(final Message msg) {
-            if (progressBarWeakReference.get() != null) {
-                final int progress = msg.arg1;
-                final ProgressBar progressBar = progressBarWeakReference.get();
-                progressBar.setProgress(progress);
-            }
-        }
     }
 
 
