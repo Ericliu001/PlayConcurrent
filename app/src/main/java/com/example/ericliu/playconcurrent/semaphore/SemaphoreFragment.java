@@ -24,8 +24,6 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.example.ericliu.playconcurrent.listcontent.ItemDetailsActivity.ARG_ITEM;
-
 /**
  * A fragment representing a single Item detail screen.
  * This fragment is either contained in a {@link ItemListActivity}
@@ -54,10 +52,7 @@ public class SemaphoreFragment extends BaseFragment {
 
     public static Fragment newInstance(final ListItem listItem) {
         final Fragment fragment = new SemaphoreFragment();
-        final Bundle args = new Bundle();
-        args.putParcelable(ARG_ITEM, listItem);
-        fragment.setArguments(args);
-        return fragment;
+        return setArguments(listItem, fragment);
     }
 
 

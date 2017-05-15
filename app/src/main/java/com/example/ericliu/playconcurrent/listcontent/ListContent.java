@@ -1,5 +1,6 @@
 package com.example.ericliu.playconcurrent.listcontent;
 
+import com.example.ericliu.playconcurrent.countdownlatch.CountDownLatchFragment;
 import com.example.ericliu.playconcurrent.semaphore.SemaphoreFragment;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ public class ListContent {
 
     static {
         ITEMS.add(new ListItem("Semaphore", SemaphoreFragment.class));
+        ITEMS.add(new ListItem("CountDownLatch", CountDownLatchFragment.class));
     }
 
 }

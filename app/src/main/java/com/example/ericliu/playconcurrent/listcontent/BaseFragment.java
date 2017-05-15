@@ -3,6 +3,7 @@ package com.example.ericliu.playconcurrent.listcontent;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.view.View;
@@ -16,6 +17,14 @@ import static com.example.ericliu.playconcurrent.listcontent.ItemDetailsActivity
  */
 
 public class BaseFragment extends Fragment {
+    @NonNull
+    protected static Fragment setArguments(final ListItem listItem, final Fragment fragment) {
+        final Bundle args = new Bundle();
+        args.putParcelable(ARG_ITEM, listItem);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
