@@ -32,12 +32,12 @@ public class LatchWorkerThread extends Thread {
             beforeLatch.await();
 
             while (progress < 100) {
-                sleep(300); // we use a sleep call to mock some lengthy work.
+                sleep(500); // we use a sleep call to mock some lengthy work.
                 if (progressBarHandler != null) {
                     Random random = new Random();
-                    int i = random.nextInt(5);
+                    int i = random.nextInt(10);
                     Message message = progressBarHandler.obtainMessage();
-                    message.arg1 = (progress += 10 * i);
+                    message.arg1 = (progress += 5 * i);
                     progressBarHandler.sendMessage(message);
                 }
             }
