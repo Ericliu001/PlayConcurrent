@@ -33,7 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class SemaphoreFragment extends BaseFragment {
 
     // the 5 progressbars that take turns to increment.
-    private ProgressBar pb1, pb2, pb3, pb4, pb5;
+    private ProgressBar  pb0, pb1, pb2, pb3, pb4;
     private Button btnPlay;
 
     private static final int NUM_PROGRESSBARS = 5;
@@ -102,11 +102,11 @@ public class SemaphoreFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.item_detail, container, false);
+        pb0 = (ProgressBar) rootView.findViewById(R.id.progressBar0);
         pb1 = (ProgressBar) rootView.findViewById(R.id.progressBar1);
         pb2 = (ProgressBar) rootView.findViewById(R.id.progressBar2);
         pb3 = (ProgressBar) rootView.findViewById(R.id.progressBar3);
         pb4 = (ProgressBar) rootView.findViewById(R.id.progressBar4);
-        pb5 = (ProgressBar) rootView.findViewById(R.id.progressBar5);
 
         btnPlay = (Button) rootView.findViewById(R.id.btnPlay);
 
@@ -117,17 +117,17 @@ public class SemaphoreFragment extends BaseFragment {
     @Override
     public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ProgressBarHandler progressBarHandler0 = new ProgressBarHandler(pb0);
         ProgressBarHandler progressBarHandler1 = new ProgressBarHandler(pb1);
         ProgressBarHandler progressBarHandler2 = new ProgressBarHandler(pb2);
         ProgressBarHandler progressBarHandler3 = new ProgressBarHandler(pb3);
         ProgressBarHandler progressBarHandler4 = new ProgressBarHandler(pb4);
-        ProgressBarHandler progressBarHandler5 = new ProgressBarHandler(pb5);
 
-        threads.get(0).setProgressBarHandler(progressBarHandler1);
-        threads.get(1).setProgressBarHandler(progressBarHandler2);
-        threads.get(2).setProgressBarHandler(progressBarHandler3);
-        threads.get(3).setProgressBarHandler(progressBarHandler4);
-        threads.get(4).setProgressBarHandler(progressBarHandler5);
+        threads.get(0).setProgressBarHandler(progressBarHandler0);
+        threads.get(1).setProgressBarHandler(progressBarHandler1);
+        threads.get(2).setProgressBarHandler(progressBarHandler2);
+        threads.get(3).setProgressBarHandler(progressBarHandler3);
+        threads.get(4).setProgressBarHandler(progressBarHandler4);
 
 
         btnPlay.setOnClickListener(new View.OnClickListener() {

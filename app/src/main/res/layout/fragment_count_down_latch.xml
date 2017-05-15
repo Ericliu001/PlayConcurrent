@@ -5,13 +5,14 @@
                 tools:context="com.example.ericliu.playconcurrent.countdownlatch.CountDownLatchFragment">
 
     <FrameLayout
+        android:id="@+id/progressbarContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <LinearLayout
-            android:layout_margin="50dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="50dp"
             android:orientation="vertical">
 
             <ProgressBar
@@ -45,6 +46,40 @@
                 android:layout_height="30dp"/>
         </LinearLayout>
 
+        <RelativeLayout
+            android:id="@+id/initializingView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Initializing"
+                android:textColor="@android:color/white"/>
+
+            <ProgressBar
+                android:id="@+id/pbInitializing"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/tvInitializing"/>
+
+
+        </RelativeLayout>
+
     </FrameLayout>
+
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/progressbarContainer"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:text="Start"/>
 
 </RelativeLayout>
